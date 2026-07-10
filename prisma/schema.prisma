@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Profile {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullName  String   @map("full_name")
+  email     String   @unique
+  role      String   @default("wali") // "pengurus" | "wali"
+  createdAt DateTime @default(now()) @map("created_at")
+
+  guardianStudents GuardianStudent[]
+
+  @@map("profiles")
+}
+
+model Student {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullName       String   @map("full_name")
+  roomNumber     String   @map("room_number")
+  currentBalance Decimal  @default(0) @map("current_balance") @db.Decimal(12, 2)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  transactions     Transaction[]
+  guardianStudents GuardianStudent[]
+
+  @@map("students")
+}
+
+model Transaction {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId       String   @map("student_id") @db.Uuid
+  transactionDate DateTime @map("transaction_date")
+  description     String
+  type            String   // "IN" | "OUT"
+  amount          Decimal  @db.Decimal(12, 2)
+  balanceAfter    Decimal  @map("balance_after") @db.Decimal(12, 2)
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+model GuardianStudent {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  guardianId String @map("guardian_id") @db.Uuid
+  studentId  String @map("student_id") @db.Uuid
+
+  guardian Profile @relation(fields: [guardianId], references: [id], onDelete: Cascade)
+  student  Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([guardianId, studentId])
+  @@map("guardian_students")
+}
