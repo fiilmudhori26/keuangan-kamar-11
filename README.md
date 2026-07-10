@@ -84,6 +84,6 @@ Jika Anda ingin mengkloning dan menjalankan proyek ini di komputer Anda sendiri:
 
 ## 👨‍💻 Dibuat Oleh
 
-**[Nama Anda]**  
+**[Rahmad Akbar]**  
 *Full-Stack Web Developer*  
-[LinkedIn](https://linkedin.com/in/username-anda) • [GitHub](https://github.com/fiilmudhori26)
+[LinkedIn](https://linkedin.com/in/Rahmad Akbar) • [GitHub](https://github.com/fiilmudhori26)
