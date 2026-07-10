@@ -9,7 +9,7 @@ import { formatCurrency } from "@/lib/utils";
 import type { StudentData, PaginatedResponse } from "@/types";
 import { useDebounce } from "@/hooks/use-debounce";
 import Link from "next/link";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 export default function PortalSearchPage() {
   const [data, setData] = useState<PaginatedResponse<StudentData> | null>(null);

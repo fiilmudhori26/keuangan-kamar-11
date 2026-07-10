@@ -11,7 +11,7 @@ import { id } from "date-fns/locale";
 import type { StudentData } from "@/types";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 export default function PortalStudentDetailsPage() {
   const params = useParams();
