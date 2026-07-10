@@ -37,7 +37,7 @@ export async function updateSession(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // Public paths that don't require authentication
-  const isPublicPath = path === "/login" || path === "/";
+  const isPublicPath = path === "/login" || path === "/" || path.startsWith("/portal");
 
   // If user is not authenticated and trying to access protected route
   if (!user && !isPublicPath) {
@@ -56,11 +56,7 @@ export async function updateSession(request: NextRequest) {
       .single();
 
     const url = request.nextUrl.clone();
-    if (profile?.role === "wali") {
-      url.pathname = "/portal";
-    } else {
-      url.pathname = "/dashboard";
-    }
+    url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }
 
@@ -83,22 +79,6 @@ export async function updateSession(request: NextRequest) {
         url.pathname = "/portal";
         return NextResponse.redirect(url);
       }
-    }
-
-    // If pengurus tries to access wali portal
-    if (path === "/portal" || path.startsWith("/portal/")) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-
-      if (profile?.role === "pengurus") {
-        const url = request.nextUrl.clone();
-        url.pathname = "/dashboard";
-        return NextResponse.redirect(url);
-      }
-    }
   }
 
   return supabaseResponse;

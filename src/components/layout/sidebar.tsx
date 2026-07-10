@@ -28,11 +28,6 @@ const navItems = [
     href: "/transactions",
     icon: ArrowLeftRight,
   },
-  {
-    title: "Kelola Wali",
-    href: "/guardians",
-    icon: UserCog,
-  },
 ];
 
 interface SidebarProps {

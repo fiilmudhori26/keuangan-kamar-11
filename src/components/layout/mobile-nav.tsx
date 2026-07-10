@@ -20,7 +20,6 @@ const navItems = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { title: "Data Santri", href: "/students", icon: Users },
   { title: "Transaksi", href: "/transactions", icon: ArrowLeftRight },
-  { title: "Kelola Wali", href: "/guardians", icon: UserCog },
 ];
 
 export function MobileNav() {
