@@ -79,6 +79,7 @@ export async function updateSession(request: NextRequest) {
         url.pathname = "/portal";
         return NextResponse.redirect(url);
       }
+    }
   }
 
   return supabaseResponse;
