@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -491,13 +492,12 @@ export default function StudentDetailPage() {
             </div>
             <div className="space-y-2">
               <Label>Jumlah (Rp) *</Label>
-              <Input
-                type="number"
+              <CurrencyInput
+                value={txAmount}
+                onChange={setTxAmount}
+                disabled={submitting}
                 placeholder="0"
                 min="1"
-                value={txAmount}
-                onChange={(e) => setTxAmount(e.target.value)}
-                disabled={submitting}
               />
             </div>
             <div className="space-y-2">

@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { ArrowLeft, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -22,6 +23,8 @@ export default function NewStudentPage() {
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<StudentFormValues>({
     resolver: zodResolver(studentFormSchema),
@@ -31,6 +34,8 @@ export default function NewStudentPage() {
       initialBalance: "0",
     },
   });
+
+  const initialBalance = watch("initialBalance");
 
   async function onSubmit(data: StudentFormValues) {
     setLoading(true);
@@ -111,13 +116,11 @@ export default function NewStudentPage() {
                   (opsional)
                 </span>
               </Label>
-              <Input
+              <CurrencyInput
                 id="initialBalance"
-                type="number"
-                placeholder="0"
-                min="0"
+                value={initialBalance || "0"}
+                onChange={(v) => setValue("initialBalance", v)}
                 disabled={loading}
-                {...register("initialBalance")}
               />
               {errors.initialBalance && (
                 <p className="text-xs text-destructive">
