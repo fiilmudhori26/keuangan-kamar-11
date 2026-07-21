@@ -229,70 +229,74 @@ export default function GuardiansPage() {
       ) : (
         <>
           <Card className="overflow-hidden animate-fade-in">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nama Wali</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Santri Terhubung</TableHead>
-                  <TableHead>Kamar</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.data.map((gs) => (
-                  <TableRow key={gs.id} className="group">
-                    <TableCell className="font-medium">
-                      {gs.guardian?.fullName}
-                    </TableCell>
-                    <TableCell>
-                      <span className="flex items-center gap-1.5 text-muted-foreground">
-                        <Mail className="h-3 w-3" />
-                        {gs.guardian?.email}
-                      </span>
-                    </TableCell>
-                    <TableCell>{gs.student?.fullName}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className="font-normal">
-                        Kamar {gs.student?.roomNumber}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => setDeleteId(gs.guardianId)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="whitespace-nowrap">Nama Wali</TableHead>
+                    <TableHead className="whitespace-nowrap">Email</TableHead>
+                    <TableHead className="whitespace-nowrap">Santri</TableHead>
+                    <TableHead className="whitespace-nowrap">Kamar</TableHead>
+                    <TableHead className="whitespace-nowrap text-right">Aksi</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {data.data.map((gs) => (
+                    <TableRow key={gs.id} className="group">
+                      <TableCell className="font-medium whitespace-nowrap">
+                        {gs.guardian?.fullName}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        <span className="flex items-center gap-1.5 text-muted-foreground">
+                          <Mail className="h-3 w-3" />
+                          {gs.guardian?.email}
+                        </span>
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">{gs.student?.fullName}</TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        <Badge variant="secondary" className="font-normal">
+                          Kamar {gs.student?.roomNumber}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-9 w-9 text-destructive md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                          onClick={() => setDeleteId(gs.guardianId)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </Card>
 
           {data.totalPages > 1 && (
-            <div className="flex items-center justify-between mt-4">
-              <p className="text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+              <p className="text-sm text-muted-foreground order-2 sm:order-1">
                 {data.total} wali terdaftar
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 order-1 sm:order-2">
                 <Button
                   variant="outline"
                   size="sm"
+                  className="min-h-[36px] min-w-[36px]"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => p - 1)}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="text-sm font-medium px-2 tabular-nums">
+                <span className="text-sm font-medium px-3 tabular-nums">
                   {page} / {data.totalPages}
                 </span>
                 <Button
                   variant="outline"
                   size="sm"
+                  className="min-h-[36px] min-w-[36px]"
                   disabled={page >= data.totalPages}
                   onClick={() => setPage((p) => p + 1)}
                 >

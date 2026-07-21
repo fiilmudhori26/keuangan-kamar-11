@@ -13,13 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -296,14 +290,14 @@ export default function StudentDetailPage() {
       <Card className="animate-fade-in animate-delay-4">
         <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <CardTitle className="text-lg">Riwayat Transaksi</CardTitle>
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex gap-1">
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1 overflow-x-auto pb-0.5 scrollbar-none">
               {(["today", "week", "month"] as DateFilterType[]).map((f) => (
                 <Button
                   key={f}
                   variant={dateFilter === f ? "default" : "outline"}
                   size="sm"
-                  className="text-xs"
+                  className="text-xs whitespace-nowrap min-h-[36px]"
                   onClick={() => {
                     setDateFilter(f);
                     setTxPage(1);
@@ -318,7 +312,7 @@ export default function StudentDetailPage() {
               ))}
             </div>
             <Button
-              className="gap-2"
+              className="gap-2 min-h-[36px]"
               size="sm"
               onClick={() => setShowTxDialog(true)}
             >
@@ -345,88 +339,92 @@ export default function StudentDetailPage() {
             />
           ) : (
             <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tanggal</TableHead>
-                    <TableHead>Deskripsi</TableHead>
-                    <TableHead>Jenis</TableHead>
-                    <TableHead className="text-right">Jumlah</TableHead>
-                    <TableHead className="text-right">Saldo</TableHead>
-                    <TableHead className="w-[50px]"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {transactions.map((tx) => (
-                    <TableRow key={tx.id} className="group">
-                      <TableCell className="text-sm whitespace-nowrap">
-                        {formatDateShort(tx.transactionDate)}
-                      </TableCell>
-                      <TableCell className="max-w-[200px] truncate">
-                        {tx.description}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={tx.type === "IN" ? "success" : "warning"}
-                          className="gap-1"
-                        >
-                          {tx.type === "IN" ? (
-                            <ArrowDownRight className="h-3 w-3" />
-                          ) : (
-                            <ArrowUpRight className="h-3 w-3" />
-                          )}
-                          {tx.type === "IN" ? "Masuk" : "Keluar"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell
-                        className={`text-right font-semibold tabular-nums ${
-                          tx.type === "IN"
-                            ? "text-teal dark:text-teal"
-                            : "text-red-600 dark:text-red-400"
-                        }`}
-                      >
-                        {tx.type === "IN" ? "+" : "-"}
-                        {formatCurrency(Number(tx.amount))}
-                      </TableCell>
-                      <TableCell className="text-right text-sm tabular-nums">
-                        {formatCurrency(Number(tx.balanceAfter))}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground/50 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => setDeleteId(tx.id)}
-                          title="Hapus transaksi"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="whitespace-nowrap">Tanggal</TableHead>
+                      <TableHead className="whitespace-nowrap">Deskripsi</TableHead>
+                      <TableHead className="whitespace-nowrap">Jenis</TableHead>
+                      <TableHead className="whitespace-nowrap text-right">Jumlah</TableHead>
+                      <TableHead className="whitespace-nowrap text-right">Saldo</TableHead>
+                      <TableHead className="w-[56px]"></TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {transactions.map((tx) => (
+                      <TableRow key={tx.id} className="group">
+                        <TableCell className="text-sm whitespace-nowrap">
+                          {formatDateShort(tx.transactionDate)}
+                        </TableCell>
+                        <TableCell className="max-w-[160px] sm:max-w-[200px] truncate">
+                          {tx.description}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={tx.type === "IN" ? "success" : "warning"}
+                            className="gap-1 whitespace-nowrap"
+                          >
+                            {tx.type === "IN" ? (
+                              <ArrowDownRight className="h-3 w-3" />
+                            ) : (
+                              <ArrowUpRight className="h-3 w-3" />
+                            )}
+                            {tx.type === "IN" ? "Masuk" : "Keluar"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell
+                          className={`text-right font-semibold tabular-nums whitespace-nowrap ${
+                            tx.type === "IN"
+                              ? "text-teal dark:text-teal"
+                              : "text-red-600 dark:text-red-400"
+                          }`}
+                        >
+                          {tx.type === "IN" ? "+" : "-"}
+                          {formatCurrency(Number(tx.amount))}
+                        </TableCell>
+                        <TableCell className="text-right text-sm tabular-nums whitespace-nowrap">
+                          {formatCurrency(Number(tx.balanceAfter))}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 text-muted-foreground/50 hover:text-destructive md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                            onClick={() => setDeleteId(tx.id)}
+                            title="Hapus transaksi"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
 
               {txTotalPages > 1 && (
-                <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                  <p className="text-sm text-muted-foreground">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 pt-4 border-t">
+                  <p className="text-sm text-muted-foreground order-2 sm:order-1">
                     {txTotal} transaksi
                   </p>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 order-1 sm:order-2">
                     <Button
                       variant="outline"
                       size="sm"
+                      className="min-h-[36px] min-w-[36px]"
                       disabled={txPage <= 1}
                       onClick={() => setTxPage((p) => p - 1)}
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <span className="text-sm font-medium px-2 tabular-nums">
+                    <span className="text-sm font-medium px-3 tabular-nums">
                       {txPage} / {txTotalPages}
                     </span>
                     <Button
                       variant="outline"
                       size="sm"
+                      className="min-h-[36px] min-w-[36px]"
                       disabled={txPage >= txTotalPages}
                       onClick={() => setTxPage((p) => p + 1)}
                     >
@@ -460,19 +458,36 @@ export default function StudentDetailPage() {
             </div>
             <div className="space-y-2">
               <Label>Jenis Transaksi *</Label>
-              <Select
-                value={txType}
-                onValueChange={(v) => setTxType(v as "IN" | "OUT")}
-                disabled={submitting}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="IN">Uang Masuk</SelectItem>
-                  <SelectItem value="OUT">Uang Keluar</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  disabled={submitting}
+                  onClick={() => setTxType("IN")}
+                  className={cn(
+                    "flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 text-sm font-semibold transition-all duration-200 min-h-[48px]",
+                    txType === "IN"
+                      ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:border-emerald-500 dark:bg-emerald-950/40 dark:text-emerald-400 shadow-sm"
+                      : "border-border bg-background text-muted-foreground hover:border-emerald-200 hover:bg-emerald-50/50 dark:hover:border-emerald-800 dark:hover:bg-emerald-950/20"
+                  )}
+                >
+                  <ArrowDownRight className="h-5 w-5" />
+                  Uang Masuk
+                </button>
+                <button
+                  type="button"
+                  disabled={submitting}
+                  onClick={() => setTxType("OUT")}
+                  className={cn(
+                    "flex items-center justify-center gap-2 rounded-xl border-2 px-4 py-3 text-sm font-semibold transition-all duration-200 min-h-[48px]",
+                    txType === "OUT"
+                      ? "border-red-500 bg-red-50 text-red-700 dark:border-red-500 dark:bg-red-950/40 dark:text-red-400 shadow-sm"
+                      : "border-border bg-background text-muted-foreground hover:border-red-200 hover:bg-red-50/50 dark:hover:border-red-800 dark:hover:bg-red-950/20"
+                  )}
+                >
+                  <ArrowUpRight className="h-5 w-5" />
+                  Uang Keluar
+                </button>
+              </div>
             </div>
             <div className="space-y-2">
               <Label>Jumlah (Rp) *</Label>

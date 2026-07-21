@@ -35,7 +35,6 @@ import {
   ArrowUpRight,
   ChevronLeft,
   ChevronRight,
-  Filter,
   Trash2,
   AlertTriangle,
 } from "lucide-react";
@@ -98,6 +97,12 @@ export default function TransactionsPage() {
     }
   };
 
+  const filters: { key: DateFilterType; label: string }[] = [
+    { key: "today", label: "Hari Ini" },
+    { key: "week", label: "Minggu Ini" },
+    { key: "month", label: "Bulan Ini" },
+  ];
+
   return (
     <>
       <PageHeader
@@ -105,32 +110,26 @@ export default function TransactionsPage() {
         description="Semua transaksi keuangan santri"
       />
 
-      <Card className="p-4 mb-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground mr-2">Filter:</span>
-          {(["today", "week", "month"] as DateFilterType[]).map((f) => (
+      <Card className="p-3 sm:p-4 mb-4">
+        <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {filters.map((f) => (
             <Button
-              key={f}
-              variant={dateFilter === f ? "default" : "outline"}
+              key={f.key}
+              variant={dateFilter === f.key ? "default" : "outline"}
               size="sm"
-              className="text-xs"
+              className="text-xs whitespace-nowrap min-h-[36px]"
               onClick={() => {
-                setDateFilter(f);
+                setDateFilter(f.key);
                 setShowCustom(false);
               }}
             >
-              {f === "today"
-                ? "Hari Ini"
-                : f === "week"
-                ? "Minggu Ini"
-                : "Bulan Ini"}
+              {f.label}
             </Button>
           ))}
           <Button
             variant={dateFilter === "custom" ? "default" : "outline"}
             size="sm"
-            className="text-xs"
+            className="text-xs whitespace-nowrap min-h-[36px]"
             onClick={() => {
               setDateFilter("custom");
               setShowCustom(true);
@@ -141,28 +140,29 @@ export default function TransactionsPage() {
         </div>
 
         {showCustom && (
-          <div className="flex flex-wrap gap-4 mt-4 animate-fade-in">
-            <div className="space-y-1">
+          <div className="flex flex-col sm:flex-row gap-3 mt-4 animate-fade-in">
+            <div className="flex-1 space-y-1">
               <Label className="text-xs">Dari</Label>
               <Input
                 type="date"
                 value={customFrom}
                 onChange={(e) => setCustomFrom(e.target.value)}
-                className="w-40"
+                className="w-full"
               />
             </div>
-            <div className="space-y-1">
+            <div className="flex-1 space-y-1">
               <Label className="text-xs">Sampai</Label>
               <Input
                 type="date"
                 value={customTo}
                 onChange={(e) => setCustomTo(e.target.value)}
-                className="w-40"
+                className="w-full"
               />
             </div>
             <div className="flex items-end">
               <Button
-                size="sm"
+                size="default"
+                className="w-full sm:w-auto min-h-[44px]"
                 onClick={() => {
                   setPage(1);
                   fetchTransactions();
@@ -188,100 +188,104 @@ export default function TransactionsPage() {
       ) : (
         <>
           <Card className="overflow-hidden animate-fade-in">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Santri</TableHead>
-                  <TableHead>Deskripsi</TableHead>
-                  <TableHead>Jenis</TableHead>
-                  <TableHead className="text-right">Jumlah</TableHead>
-                  <TableHead className="text-right">Saldo</TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.data.map((tx) => (
-                  <TableRow key={tx.id} className="group">
-                    <TableCell className="text-sm whitespace-nowrap">
-                      {formatDateShort(tx.transactionDate)}
-                    </TableCell>
-                    <TableCell>
-                      <Link
-                        href={`/students/${tx.studentId}`}
-                        className="text-primary hover:underline font-medium"
-                      >
-                        {tx.student?.fullName || "—"}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="max-w-[200px] truncate">
-                      {tx.description}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={tx.type === "IN" ? "success" : "warning"}
-                        className="gap-1"
-                      >
-                        {tx.type === "IN" ? (
-                          <ArrowDownRight className="h-3 w-3" />
-                        ) : (
-                          <ArrowUpRight className="h-3 w-3" />
-                        )}
-                        {tx.type === "IN" ? "Masuk" : "Keluar"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell
-                      className={`text-right font-semibold tabular-nums ${
-                        tx.type === "IN"
-                          ? "text-teal dark:text-teal"
-                          : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {tx.type === "IN" ? "+" : "-"}
-                      {formatCurrency(Number(tx.amount))}
-                    </TableCell>
-                    <TableCell className="text-right text-sm tabular-nums">
-                      {formatCurrency(Number(tx.balanceAfter))}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground/50 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => setDeleteId(tx.id)}
-                        title="Hapus transaksi"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="whitespace-nowrap">Tanggal</TableHead>
+                    <TableHead className="whitespace-nowrap">Santri</TableHead>
+                    <TableHead className="whitespace-nowrap">Deskripsi</TableHead>
+                    <TableHead className="whitespace-nowrap">Jenis</TableHead>
+                    <TableHead className="whitespace-nowrap text-right">Jumlah</TableHead>
+                    <TableHead className="whitespace-nowrap text-right">Saldo</TableHead>
+                    <TableHead className="w-[56px]"></TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {data.data.map((tx) => (
+                    <TableRow key={tx.id} className="group">
+                      <TableCell className="text-sm whitespace-nowrap">
+                        {formatDateShort(tx.transactionDate)}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        <Link
+                          href={`/students/${tx.studentId}`}
+                          className="text-primary hover:underline font-medium"
+                        >
+                          {tx.student?.fullName || "—"}
+                        </Link>
+                      </TableCell>
+                      <TableCell className="max-w-[160px] sm:max-w-[200px] truncate">
+                        {tx.description}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={tx.type === "IN" ? "success" : "warning"}
+                          className="gap-1 whitespace-nowrap"
+                        >
+                          {tx.type === "IN" ? (
+                            <ArrowDownRight className="h-3 w-3" />
+                          ) : (
+                            <ArrowUpRight className="h-3 w-3" />
+                          )}
+                          {tx.type === "IN" ? "Masuk" : "Keluar"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell
+                        className={`text-right font-semibold tabular-nums whitespace-nowrap ${
+                          tx.type === "IN"
+                            ? "text-teal dark:text-teal"
+                            : "text-red-600 dark:text-red-400"
+                        }`}
+                      >
+                        {tx.type === "IN" ? "+" : "-"}
+                        {formatCurrency(Number(tx.amount))}
+                      </TableCell>
+                      <TableCell className="text-right text-sm tabular-nums whitespace-nowrap">
+                        {formatCurrency(Number(tx.balanceAfter))}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-9 w-9 text-muted-foreground/50 hover:text-destructive md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                          onClick={() => setDeleteId(tx.id)}
+                          title="Hapus transaksi"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </Card>
 
           {data.totalPages > 1 && (
-            <div className="flex items-center justify-between mt-4">
-              <p className="text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+              <p className="text-sm text-muted-foreground order-2 sm:order-1">
                 Menampilkan {(page - 1) * data.pageSize + 1}–
                 {Math.min(page * data.pageSize, data.total)} dari {data.total}{" "}
                 transaksi
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 order-1 sm:order-2">
                 <Button
                   variant="outline"
                   size="sm"
+                  className="min-h-[36px] min-w-[36px]"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => p - 1)}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="text-sm font-medium px-2 tabular-nums">
+                <span className="text-sm font-medium px-3 tabular-nums">
                   {page} / {data.totalPages}
                 </span>
                 <Button
                   variant="outline"
                   size="sm"
+                  className="min-h-[36px] min-w-[36px]"
                   disabled={page >= data.totalPages}
                   onClick={() => setPage((p) => p + 1)}
                 >
@@ -297,7 +301,7 @@ export default function TransactionsPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center">
+              <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="h-5 w-5 text-destructive" />
               </div>
               <div>

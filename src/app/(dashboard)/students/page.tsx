@@ -149,92 +149,96 @@ export default function StudentsPage() {
       ) : (
         <>
           <Card className="overflow-hidden animate-fade-in">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nama Santri</TableHead>
-                  <TableHead>Kamar</TableHead>
-                  <TableHead className="text-right">Saldo</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.data.map((student) => (
-                  <TableRow key={student.id} className="group">
-                    <TableCell className="font-medium">
-                      {student.fullName}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className="font-normal">
-                        Kamar {student.roomNumber}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right font-semibold tabular-nums text-teal dark:text-teal">
-                      {formatCurrency(Number(student.currentBalance))}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() =>
-                            router.push(`/students/${student.id}`)
-                          }
-                          aria-label="Lihat detail"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() =>
-                            router.push(`/students/${student.id}`)
-                          }
-                          aria-label="Edit santri"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={() => setDeleteId(student.id)}
-                          aria-label="Hapus santri"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="whitespace-nowrap">Nama Santri</TableHead>
+                    <TableHead className="whitespace-nowrap">Kamar</TableHead>
+                    <TableHead className="whitespace-nowrap text-right">Saldo</TableHead>
+                    <TableHead className="whitespace-nowrap text-right">Aksi</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {data.data.map((student) => (
+                    <TableRow key={student.id} className="group">
+                      <TableCell className="font-medium">
+                        {student.fullName}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="font-normal whitespace-nowrap">
+                          Kamar {student.roomNumber}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right font-semibold tabular-nums text-teal dark:text-teal whitespace-nowrap">
+                        {formatCurrency(Number(student.currentBalance))}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                            onClick={() =>
+                              router.push(`/students/${student.id}`)
+                            }
+                            aria-label="Lihat detail"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                            onClick={() =>
+                              router.push(`/students/${student.id}`)
+                            }
+                            aria-label="Edit santri"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 text-destructive md:opacity-0 md:group-hover:opacity-100 transition-opacity"
+                            onClick={() => setDeleteId(student.id)}
+                            aria-label="Hapus santri"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </Card>
 
           {data.totalPages > 1 && (
-            <div className="flex items-center justify-between mt-4">
-              <p className="text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+              <p className="text-sm text-muted-foreground order-2 sm:order-1">
                 Menampilkan {(page - 1) * data.pageSize + 1}–
                 {Math.min(page * data.pageSize, data.total)} dari {data.total}{" "}
                 santri
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 order-1 sm:order-2">
                 <Button
                   variant="outline"
                   size="sm"
+                  className="min-h-[36px] min-w-[36px]"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => p - 1)}
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="text-sm font-medium px-2 tabular-nums">
+                <span className="text-sm font-medium px-3 tabular-nums">
                   {page} / {data.totalPages}
                 </span>
                 <Button
                   variant="outline"
                   size="sm"
+                  className="min-h-[36px] min-w-[36px]"
                   disabled={page >= data.totalPages}
                   onClick={() => setPage((p) => p + 1)}
                 >
