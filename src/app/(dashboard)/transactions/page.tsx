@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getTransactions } from "@/actions/transactions";
+import { getTransactions, deleteTransaction } from "@/actions/transactions";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { TableSkeleton } from "@/components/shared/loading-skeleton";
@@ -18,6 +18,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { formatCurrency, formatDateShort } from "@/lib/utils";
 import {
   ArrowLeftRight,
@@ -26,6 +36,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { TransactionData, DateFilterType, PaginatedResponse } from "@/types";
@@ -39,6 +51,8 @@ export default function TransactionsPage() {
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
   const [showCustom, setShowCustom] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true);
@@ -65,6 +79,25 @@ export default function TransactionsPage() {
     setPage(1);
   }, [dateFilter]);
 
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    setDeleting(true);
+    try {
+      const result = await deleteTransaction(deleteId);
+      if (result.success) {
+        toast.success("Transaksi berhasil dihapus");
+        setDeleteId(null);
+        fetchTransactions();
+      } else {
+        toast.error(result.error || "Gagal menghapus transaksi");
+      }
+    } catch {
+      toast.error("Gagal menghapus transaksi");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <>
       <PageHeader
@@ -72,8 +105,7 @@ export default function TransactionsPage() {
         description="Semua transaksi keuangan santri"
       />
 
-      {/* Filters */}
-      <Card className="p-4 mb-4 border-0 shadow-md">
+      <Card className="p-4 mb-4">
         <div className="flex flex-wrap items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm text-muted-foreground mr-2">Filter:</span>
@@ -108,7 +140,6 @@ export default function TransactionsPage() {
           </Button>
         </div>
 
-        {/* Custom date range */}
         {showCustom && (
           <div className="flex flex-wrap gap-4 mt-4 animate-fade-in">
             <div className="space-y-1">
@@ -147,7 +178,7 @@ export default function TransactionsPage() {
       {loading ? (
         <TableSkeleton rows={8} />
       ) : !data || data.data.length === 0 ? (
-        <Card className="border-0 shadow-md">
+        <Card>
           <EmptyState
             icon={ArrowLeftRight}
             title="Tidak ada transaksi"
@@ -156,22 +187,23 @@ export default function TransactionsPage() {
         </Card>
       ) : (
         <>
-          <Card className="border-0 shadow-md overflow-hidden animate-fade-in">
+          <Card className="overflow-hidden animate-fade-in">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/50">
+                <TableRow>
                   <TableHead>Tanggal</TableHead>
                   <TableHead>Santri</TableHead>
                   <TableHead>Deskripsi</TableHead>
                   <TableHead>Jenis</TableHead>
                   <TableHead className="text-right">Jumlah</TableHead>
-                  <TableHead className="text-right">Saldo Setelah</TableHead>
+                  <TableHead className="text-right">Saldo</TableHead>
+                  <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.data.map((tx) => (
                   <TableRow key={tx.id} className="group">
-                    <TableCell className="text-sm">
+                    <TableCell className="text-sm whitespace-nowrap">
                       {formatDateShort(tx.transactionDate)}
                     </TableCell>
                     <TableCell>
@@ -199,17 +231,28 @@ export default function TransactionsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell
-                      className={`text-right font-semibold ${
+                      className={`text-right font-semibold tabular-nums ${
                         tx.type === "IN"
-                          ? "text-emerald-600 dark:text-emerald-400"
+                          ? "text-teal dark:text-teal"
                           : "text-red-600 dark:text-red-400"
                       }`}
                     >
                       {tx.type === "IN" ? "+" : "-"}
                       {formatCurrency(Number(tx.amount))}
                     </TableCell>
-                    <TableCell className="text-right text-sm">
+                    <TableCell className="text-right text-sm tabular-nums">
                       {formatCurrency(Number(tx.balanceAfter))}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground/50 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => setDeleteId(tx.id)}
+                        title="Hapus transaksi"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -217,7 +260,6 @@ export default function TransactionsPage() {
             </Table>
           </Card>
 
-          {/* Pagination */}
           {data.totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
               <p className="text-sm text-muted-foreground">
@@ -234,7 +276,7 @@ export default function TransactionsPage() {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="text-sm font-medium px-2">
+                <span className="text-sm font-medium px-2 tabular-nums">
                   {page} / {data.totalPages}
                 </span>
                 <Button
@@ -250,6 +292,34 @@ export default function TransactionsPage() {
           )}
         </>
       )}
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+              </div>
+              <div>
+                <AlertDialogTitle>Hapus Transaksi</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Apakah Anda yakin ingin menghapus transaksi ini? Saldo santri akan dikembalikan seperti sebelum transaksi.
+                </AlertDialogDescription>
+              </div>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-4">
+            <AlertDialogCancel disabled={deleting}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleting}
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Menghapus..." : "Ya, Hapus"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

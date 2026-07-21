@@ -40,6 +40,7 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { StudentData, PaginatedResponse } from "@/types";
@@ -71,7 +72,6 @@ export default function StudentsPage() {
     fetchStudents();
   }, [fetchStudents]);
 
-  // Reset page when search changes
   useEffect(() => {
     setPage(1);
   }, [debouncedSearch]);
@@ -102,7 +102,7 @@ export default function StudentsPage() {
         description="Kelola data dan keuangan santri"
         action={
           <Link href="/students/new">
-            <Button className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-lg shadow-emerald-500/25">
+            <Button className="gap-2">
               <Plus className="h-4 w-4" />
               Tambah Santri
             </Button>
@@ -110,8 +110,7 @@ export default function StudentsPage() {
         }
       />
 
-      {/* Search */}
-      <Card className="p-4 mb-4 border-0 shadow-md">
+      <Card className="p-4 mb-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -126,7 +125,7 @@ export default function StudentsPage() {
       {loading ? (
         <TableSkeleton rows={5} />
       ) : !data || data.data.length === 0 ? (
-        <Card className="border-0 shadow-md">
+        <Card>
           <EmptyState
             icon={Users}
             title={search ? "Tidak ditemukan" : "Belum ada data santri"}
@@ -149,10 +148,10 @@ export default function StudentsPage() {
         </Card>
       ) : (
         <>
-          <Card className="border-0 shadow-md overflow-hidden animate-fade-in">
+          <Card className="overflow-hidden animate-fade-in">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/50">
+                <TableRow>
                   <TableHead>Nama Santri</TableHead>
                   <TableHead>Kamar</TableHead>
                   <TableHead className="text-right">Saldo</TableHead>
@@ -170,7 +169,7 @@ export default function StudentsPage() {
                         Kamar {student.roomNumber}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right font-semibold text-emerald-600 dark:text-emerald-400">
+                    <TableCell className="text-right font-semibold tabular-nums text-teal dark:text-teal">
                       {formatCurrency(Number(student.currentBalance))}
                     </TableCell>
                     <TableCell className="text-right">
@@ -214,7 +213,6 @@ export default function StudentsPage() {
             </Table>
           </Card>
 
-          {/* Pagination */}
           {data.totalPages > 1 && (
             <div className="flex items-center justify-between mt-4">
               <p className="text-sm text-muted-foreground">
@@ -231,7 +229,7 @@ export default function StudentsPage() {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="text-sm font-medium px-2">
+                <span className="text-sm font-medium px-2 tabular-nums">
                   {page} / {data.totalPages}
                 </span>
                 <Button
@@ -248,30 +246,35 @@ export default function StudentsPage() {
         </>
       )}
 
-      {/* Mobile FAB */}
       <Link
         href="/students/new"
         className="fixed bottom-6 right-6 lg:hidden z-50"
       >
         <Button
           size="icon"
-          className="h-14 w-14 rounded-full shadow-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
+          className="h-14 w-14 rounded-full shadow-2xl"
         >
           <Plus className="h-6 w-6" />
         </Button>
       </Link>
 
-      {/* Delete confirmation dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Santri?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tindakan ini tidak dapat dibatalkan. Semua data transaksi santri
-              ini juga akan dihapus secara permanen.
-            </AlertDialogDescription>
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+              </div>
+              <div>
+                <AlertDialogTitle>Hapus Santri?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Tindakan ini tidak dapat dibatalkan. Semua data transaksi santri
+                  ini juga akan dihapus secara permanen.
+                </AlertDialogDescription>
+              </div>
+            </div>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="mt-4">
             <AlertDialogCancel disabled={deleting}>Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}

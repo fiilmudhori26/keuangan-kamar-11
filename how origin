@@ -1,0 +1,10 @@
+* [33m532b36f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m feat: add loading skeletons for instant page transitions
+* [33m4d28114[m fix: correct theme toggle imports
+* [33m1583ef2[m fix: syntax error in middleware
+* [33mc56d462[m feat: redesign portal wali to public search without login
+* [33m824b97a[m fix: revert proxy.ts back to middleware.ts to fix vercel build
+* [33mce0cdc2[m chore: rename middleware to proxy for next16
+* [33md972b3b[m chore: add prisma postinstall script for vercel
+* [33mc60bbfa[m Siap deploy
+* [33mff5ef15[m Initial commit
+* [33m2c68aa5[m first commit

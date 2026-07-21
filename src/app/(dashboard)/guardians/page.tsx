@@ -58,6 +58,7 @@ import {
   Mail,
   ChevronLeft,
   ChevronRight,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { GuardianStudentData, PaginatedResponse } from "@/types";
@@ -73,7 +74,6 @@ export default function GuardiansPage() {
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Form state
   const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [formPassword, setFormPassword] = useState("");
@@ -102,7 +102,6 @@ export default function GuardiansPage() {
     setPage(1);
   }, [debouncedSearch]);
 
-  // Load students for the select dropdown
   useEffect(() => {
     async function loadStudents() {
       try {
@@ -181,7 +180,7 @@ export default function GuardiansPage() {
         description="Buat dan kelola akun wali santri"
         action={
           <Button
-            className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-lg shadow-emerald-500/25"
+            className="gap-2"
             onClick={() => setShowAddDialog(true)}
           >
             <Plus className="h-4 w-4" />
@@ -190,8 +189,7 @@ export default function GuardiansPage() {
         }
       />
 
-      {/* Search */}
-      <Card className="p-4 mb-4 border-0 shadow-md">
+      <Card className="p-4 mb-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -206,7 +204,7 @@ export default function GuardiansPage() {
       {loading ? (
         <TableSkeleton rows={5} />
       ) : !data || data.data.length === 0 ? (
-        <Card className="border-0 shadow-md">
+        <Card>
           <EmptyState
             icon={UserCog}
             title={search ? "Tidak ditemukan" : "Belum ada akun wali"}
@@ -230,10 +228,10 @@ export default function GuardiansPage() {
         </Card>
       ) : (
         <>
-          <Card className="border-0 shadow-md overflow-hidden animate-fade-in">
+          <Card className="overflow-hidden animate-fade-in">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/50">
+                <TableRow>
                   <TableHead>Nama Wali</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Santri Terhubung</TableHead>
@@ -289,7 +287,7 @@ export default function GuardiansPage() {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="text-sm">
+                <span className="text-sm font-medium px-2 tabular-nums">
                   {page} / {data.totalPages}
                 </span>
                 <Button
@@ -306,7 +304,6 @@ export default function GuardiansPage() {
         </>
       )}
 
-      {/* Add Guardian Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent>
           <DialogHeader>
@@ -380,7 +377,7 @@ export default function GuardiansPage() {
             <Button
               onClick={handleAddGuardian}
               disabled={submitting}
-              className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-600"
+              className="gap-2"
             >
               {submitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -393,17 +390,23 @@ export default function GuardiansPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Akun Wali?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Akun wali ini akan dihapus secara permanen dan tidak dapat
-              mengakses data santri lagi.
-            </AlertDialogDescription>
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+              </div>
+              <div>
+                <AlertDialogTitle>Hapus Akun Wali?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Akun wali ini akan dihapus secara permanen dan tidak dapat
+                  mengakses data santri lagi.
+                </AlertDialogDescription>
+              </div>
+            </div>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="mt-4">
             <AlertDialogCancel disabled={deleting}>Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}

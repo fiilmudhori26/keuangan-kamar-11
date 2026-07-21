@@ -36,9 +36,7 @@ export async function createTransaction(
   await requirePengurus();
 
   try {
-    // Use a Prisma transaction for atomicity
     const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      // 1. Get current student balance
       const student = await tx.student.findUnique({
         where: { id: studentId },
         select: { currentBalance: true },
@@ -48,18 +46,15 @@ export async function createTransaction(
 
       const currentBalance = Number(student.currentBalance);
 
-      // 2. Validate sufficient funds for OUT
       if (type === "OUT" && amount > currentBalance) {
         throw new Error(
           `Saldo tidak mencukupi. Saldo saat ini: Rp ${currentBalance.toLocaleString("id-ID")}`
         );
       }
 
-      // 3. Calculate balance_after
       const balanceAfter =
         type === "IN" ? currentBalance + amount : currentBalance - amount;
 
-      // 4. Create the transaction
       const transaction = await tx.transaction.create({
         data: {
           studentId,
@@ -71,7 +66,6 @@ export async function createTransaction(
         },
       });
 
-      // 5. Update student balance
       await tx.student.update({
         where: { id: studentId },
         data: { currentBalance: balanceAfter },
@@ -101,6 +95,48 @@ export async function createTransaction(
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Gagal menyimpan transaksi";
+    return { success: false, error: message };
+  }
+}
+
+export async function deleteTransaction(
+  transactionId: string
+): Promise<ActionResponse> {
+  await requirePengurus();
+
+  try {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const transaction = await tx.transaction.findUnique({
+        where: { id: transactionId },
+      });
+
+      if (!transaction) throw new Error("Transaksi tidak ditemukan");
+
+      const amount = Number(transaction.amount);
+      const balanceAdjustment =
+        transaction.type === "IN" ? -amount : amount;
+
+      await tx.student.update({
+        where: { id: transaction.studentId },
+        data: { currentBalance: { increment: balanceAdjustment } },
+      });
+
+      await tx.transaction.delete({
+        where: { id: transactionId },
+      });
+
+      return transaction;
+    });
+
+    revalidatePath("/transactions");
+    revalidatePath(`/students/${result.studentId}`);
+    revalidatePath("/students");
+    revalidatePath("/dashboard");
+
+    return { success: true };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Gagal menghapus transaksi";
     return { success: false, error: message };
   }
 }

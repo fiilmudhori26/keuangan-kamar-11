@@ -52,21 +52,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-gray-950 dark:via-gray-900 dark:to-emerald-950 p-4">
-      {/* Decorative background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-emerald-200/30 dark:bg-emerald-900/20 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-teal-200/30 dark:bg-teal-900/20 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-emerald-100/20 dark:bg-emerald-900/10 blur-3xl" />
-      </div>
+    <div className="relative min-h-screen flex items-center justify-center bg-sand dark:bg-navy p-4 overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230f766e' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }}
+      />
+      <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-teal/10 dark:bg-teal/5 blur-3xl" />
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-gold/10 dark:bg-gold/5 blur-3xl" />
 
-      <Card className="w-full max-w-md relative z-10 border-0 shadow-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl animate-scale-in">
+      <Card className="w-full max-w-md relative z-10 animate-scale-in">
         <CardHeader className="text-center pb-2">
-          {/* Logo */}
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/25">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal text-white shadow-lg shadow-teal/25">
             <GraduationCap className="h-8 w-8" />
           </div>
-          <CardTitle className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
+          <CardTitle className="text-2xl font-bold text-foreground">
             {APP_NAME}
           </CardTitle>
           <CardDescription className="text-sm mt-1">
@@ -76,7 +76,6 @@ export default function LoginPage() {
 
         <CardContent className="pt-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Email */}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
@@ -95,7 +94,6 @@ export default function LoginPage() {
               )}
             </div>
 
-            {/* Password */}
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
@@ -128,10 +126,9 @@ export default function LoginPage() {
               )}
             </div>
 
-            {/* Submit */}
             <Button
               type="submit"
-              className="w-full h-11 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg shadow-emerald-500/25 transition-all duration-300"
+              className="w-full h-11"
               disabled={loading}
             >
               {loading ? (

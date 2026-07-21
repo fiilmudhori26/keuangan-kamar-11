@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   Users,
   ArrowLeftRight,
-  UserCog,
   GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -40,13 +39,20 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 z-40 h-screen border-r bg-sidebar transition-all duration-300 hidden lg:flex flex-col",
+        "fixed left-0 top-0 z-40 h-screen transition-all duration-300 hidden lg:flex flex-col",
+        "bg-sidebar text-sidebar-foreground",
         collapsed ? "w-[68px]" : "w-64"
       )}
     >
-      {/* Logo */}
-      <div className="flex h-16 items-center gap-3 border-b px-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground flex-shrink-0">
+      <div
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }}
+      />
+
+      <div className="relative flex h-16 items-center gap-3 border-b border-sidebar-border px-4">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal text-white flex-shrink-0 shadow-lg shadow-teal/20">
           <GraduationCap className="h-5 w-5" />
         </div>
         {!collapsed && (
@@ -54,15 +60,14 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
             <span className="font-bold text-sm text-sidebar-foreground">
               {APP_NAME}
             </span>
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-[10px] text-sidebar-foreground/50 font-medium tracking-wide uppercase">
               Manajemen Keuangan
             </span>
           </div>
         )}
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="relative flex-1 px-3 py-6 space-y-1">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href || pathname.startsWith(item.href + "/");
@@ -71,27 +76,29 @@ export function Sidebar({ collapsed = false }: SidebarProps) {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 relative",
                 isActive
                   ? "bg-sidebar-accent text-sidebar-primary"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
               )}
             >
-              <item.icon className={cn("h-4.5 w-4.5 flex-shrink-0", isActive && "text-sidebar-primary")} />
-              {!collapsed && <span>{item.title}</span>}
               {isActive && (
-                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-sidebar-primary" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full bg-teal shadow-sm shadow-teal/50" />
               )}
+              <item.icon className={cn(
+                "h-4.5 w-4.5 flex-shrink-0",
+                isActive && "text-sidebar-primary"
+              )} />
+              {!collapsed && <span>{item.title}</span>}
             </Link>
           );
         })}
       </nav>
 
-      {/* Footer */}
       {!collapsed && (
-        <div className="border-t p-4">
-          <p className="text-[10px] text-muted-foreground text-center">
-            © 2025 Keuangan Santri
+        <div className="relative border-t border-sidebar-border p-4">
+          <p className="text-[10px] text-sidebar-foreground/30 text-center tracking-wide uppercase">
+            Pesantren &bull; 2025
           </p>
         </div>
       )}

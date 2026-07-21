@@ -71,10 +71,9 @@ export default function NewStudentPage() {
         }
       />
 
-      <Card className="max-w-2xl border-0 shadow-md animate-fade-in">
+      <Card className="max-w-2xl animate-fade-in">
         <CardContent className="p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* Name */}
             <div className="space-y-2">
               <Label htmlFor="fullName">Nama Santri *</Label>
               <Input
@@ -90,7 +89,6 @@ export default function NewStudentPage() {
               )}
             </div>
 
-            {/* Room */}
             <div className="space-y-2">
               <Label htmlFor="roomNumber">Nomor Kamar *</Label>
               <Input
@@ -106,7 +104,6 @@ export default function NewStudentPage() {
               )}
             </div>
 
-            {/* Initial Balance */}
             <div className="space-y-2">
               <Label htmlFor="initialBalance">
                 Saldo Awal{" "}
@@ -129,12 +126,11 @@ export default function NewStudentPage() {
               )}
             </div>
 
-            {/* Actions */}
             <div className="flex gap-3 pt-2">
               <Button
                 type="submit"
                 disabled={loading}
-                className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
+                className="gap-2"
               >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getStudentById, updateStudent } from "@/actions/students";
-import { getStudentTransactions, createTransaction } from "@/actions/transactions";
+import { getStudentTransactions, createTransaction, deleteTransaction } from "@/actions/transactions";
 import { PageHeader } from "@/components/shared/page-header";
 import { DetailSkeleton } from "@/components/shared/loading-skeleton";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -29,6 +29,16 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -51,6 +61,8 @@ import {
   Save,
   ChevronLeft,
   ChevronRight,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { StudentData, TransactionData, DateFilterType } from "@/types";
@@ -68,20 +80,20 @@ export default function StudentDetailPage() {
   const [txTotalPages, setTxTotalPages] = useState(0);
   const [dateFilter, setDateFilter] = useState<DateFilterType>("month");
 
-  // Dialog states
   const [showTxDialog, setShowTxDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Transaction form
   const [txDescription, setTxDescription] = useState("");
   const [txType, setTxType] = useState<"IN" | "OUT">("IN");
   const [txAmount, setTxAmount] = useState("");
   const [txDate, setTxDate] = useState(new Date().toISOString().split("T")[0]);
 
-  // Edit form
   const [editName, setEditName] = useState("");
   const [editRoom, setEditRoom] = useState("");
+
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -168,6 +180,25 @@ export default function StudentDetailPage() {
     }
   }
 
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    setDeleting(true);
+    try {
+      const result = await deleteTransaction(deleteId);
+      if (result.success) {
+        toast.success("Transaksi berhasil dihapus");
+        setDeleteId(null);
+        fetchData();
+      } else {
+        toast.error(result.error || "Gagal menghapus transaksi");
+      }
+    } catch {
+      toast.error("Gagal menghapus transaksi");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading && !student) {
     return (
       <>
@@ -181,7 +212,7 @@ export default function StudentDetailPage() {
     return (
       <>
         <PageHeader title="Santri Tidak Ditemukan" />
-        <Card className="border-0 shadow-md">
+        <Card>
           <EmptyState
             icon={User}
             title="Santri tidak ditemukan"
@@ -222,12 +253,11 @@ export default function StudentDetailPage() {
         }
       />
 
-      {/* Student Info Cards */}
       <div className="grid gap-4 md:grid-cols-3 mb-6">
-        <Card className="border-0 shadow-md animate-fade-in animate-delay-1">
+        <Card className="animate-fade-in animate-delay-1">
           <CardContent className="p-5 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center">
-              <User className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <User className="h-6 w-6 text-primary" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Nama Santri</p>
@@ -236,10 +266,10 @@ export default function StudentDetailPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-md animate-fade-in animate-delay-2">
+        <Card className="animate-fade-in animate-delay-2">
           <CardContent className="p-5 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-purple-50 dark:bg-purple-950/50 flex items-center justify-center">
-              <Home className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            <div className="h-12 w-12 rounded-xl bg-gold/10 flex items-center justify-center">
+              <Home className="h-6 w-6 text-gold" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Kamar</p>
@@ -248,14 +278,14 @@ export default function StudentDetailPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-md animate-fade-in animate-delay-3">
+        <Card className="animate-fade-in animate-delay-3">
           <CardContent className="p-5 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 flex items-center justify-center">
-              <Wallet className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+            <div className="h-12 w-12 rounded-xl bg-teal/10 flex items-center justify-center">
+              <Wallet className="h-6 w-6 text-teal" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Saldo Saat Ini</p>
-              <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
+              <p className="text-xl font-bold text-teal dark:text-teal">
                 {formatCurrency(Number(student.currentBalance))}
               </p>
             </div>
@@ -263,12 +293,10 @@ export default function StudentDetailPage() {
         </Card>
       </div>
 
-      {/* Transaction History */}
-      <Card className="border-0 shadow-md animate-fade-in animate-delay-4">
+      <Card className="animate-fade-in animate-delay-4">
         <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <CardTitle className="text-lg">Riwayat Transaksi</CardTitle>
           <div className="flex flex-wrap items-center gap-2">
-            {/* Date Filter */}
             <div className="flex gap-1">
               {(["today", "week", "month"] as DateFilterType[]).map((f) => (
                 <Button
@@ -290,12 +318,12 @@ export default function StudentDetailPage() {
               ))}
             </div>
             <Button
-              className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
+              className="gap-2"
               size="sm"
               onClick={() => setShowTxDialog(true)}
             >
               <Plus className="h-4 w-4" />
-              Tambah Transaksi
+              Tambah
             </Button>
           </div>
         </CardHeader>
@@ -319,21 +347,24 @@ export default function StudentDetailPage() {
             <>
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-muted/50">
+                  <TableRow>
                     <TableHead>Tanggal</TableHead>
                     <TableHead>Deskripsi</TableHead>
                     <TableHead>Jenis</TableHead>
                     <TableHead className="text-right">Jumlah</TableHead>
-                    <TableHead className="text-right">Saldo Setelah</TableHead>
+                    <TableHead className="text-right">Saldo</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {transactions.map((tx) => (
-                    <TableRow key={tx.id}>
-                      <TableCell className="text-sm">
+                    <TableRow key={tx.id} className="group">
+                      <TableCell className="text-sm whitespace-nowrap">
                         {formatDateShort(tx.transactionDate)}
                       </TableCell>
-                      <TableCell>{tx.description}</TableCell>
+                      <TableCell className="max-w-[200px] truncate">
+                        {tx.description}
+                      </TableCell>
                       <TableCell>
                         <Badge
                           variant={tx.type === "IN" ? "success" : "warning"}
@@ -348,17 +379,28 @@ export default function StudentDetailPage() {
                         </Badge>
                       </TableCell>
                       <TableCell
-                        className={`text-right font-semibold ${
+                        className={`text-right font-semibold tabular-nums ${
                           tx.type === "IN"
-                            ? "text-emerald-600 dark:text-emerald-400"
+                            ? "text-teal dark:text-teal"
                             : "text-red-600 dark:text-red-400"
                         }`}
                       >
                         {tx.type === "IN" ? "+" : "-"}
                         {formatCurrency(Number(tx.amount))}
                       </TableCell>
-                      <TableCell className="text-right text-sm">
+                      <TableCell className="text-right text-sm tabular-nums">
                         {formatCurrency(Number(tx.balanceAfter))}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground/50 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => setDeleteId(tx.id)}
+                          title="Hapus transaksi"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -379,7 +421,7 @@ export default function StudentDetailPage() {
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <span className="text-sm">
+                    <span className="text-sm font-medium px-2 tabular-nums">
                       {txPage} / {txTotalPages}
                     </span>
                     <Button
@@ -398,7 +440,6 @@ export default function StudentDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Add Transaction Dialog */}
       <Dialog open={showTxDialog} onOpenChange={setShowTxDialog}>
         <DialogContent>
           <DialogHeader>
@@ -428,8 +469,8 @@ export default function StudentDetailPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="IN">💰 Uang Masuk</SelectItem>
-                  <SelectItem value="OUT">💸 Uang Keluar</SelectItem>
+                  <SelectItem value="IN">Uang Masuk</SelectItem>
+                  <SelectItem value="OUT">Uang Keluar</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -465,7 +506,7 @@ export default function StudentDetailPage() {
             <Button
               onClick={handleAddTransaction}
               disabled={submitting}
-              className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-600"
+              className="gap-2"
             >
               {submitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -478,7 +519,6 @@ export default function StudentDetailPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Student Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent>
           <DialogHeader>
@@ -528,6 +568,34 @@ export default function StudentDetailPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+              </div>
+              <div>
+                <AlertDialogTitle>Hapus Transaksi</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Apakah Anda yakin ingin menghapus transaksi ini? Saldo santri akan dikembalikan seperti sebelum transaksi.
+                </AlertDialogDescription>
+              </div>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-4">
+            <AlertDialogCancel disabled={deleting}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleting}
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? "Menghapus..." : "Ya, Hapus"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

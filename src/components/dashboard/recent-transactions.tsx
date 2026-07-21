@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, ArrowDownRight, ArrowRight, ArrowLeftRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDateShort } from "@/lib/utils";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -24,13 +23,13 @@ interface RecentTransactionsProps {
 
 export function RecentTransactions({ transactions }: RecentTransactionsProps) {
   return (
-    <Card className="animate-fade-in animate-delay-4 border-0 shadow-md">
+    <Card className="animate-fade-in animate-delay-4">
       <CardHeader className="flex flex-row items-center justify-between pb-4">
         <CardTitle className="text-lg font-semibold">
           Transaksi Terbaru
         </CardTitle>
         <Link href="/transactions">
-          <Button variant="ghost" size="sm" className="text-xs gap-1">
+          <Button variant="ghost" size="sm" className="text-xs gap-1 text-primary">
             Lihat Semua
             <ArrowRight className="h-3 w-3" />
           </Button>
@@ -49,26 +48,24 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
               <Link
                 key={tx.id}
                 href={`/students/${tx.studentId}`}
-                className="flex items-center gap-4 rounded-lg p-3 hover:bg-muted/50 transition-colors group"
+                className="flex items-center gap-4 rounded-lg p-3 hover:bg-teal-50/50 dark:hover:bg-teal-950/20 transition-colors group"
               >
-                {/* Icon */}
                 <div
-                  className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  className={`h-10 w-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                     tx.type === "IN"
-                      ? "bg-emerald-100 dark:bg-emerald-900/30"
+                      ? "bg-teal/10 dark:bg-teal/20"
                       : "bg-red-100 dark:bg-red-900/30"
                   }`}
                 >
                   {tx.type === "IN" ? (
-                    <ArrowDownRight className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <ArrowDownRight className="h-4 w-4 text-teal dark:text-teal" />
                   ) : (
                     <ArrowUpRight className="h-4 w-4 text-red-600 dark:text-red-400" />
                   )}
                 </div>
 
-                {/* Details */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">
+                  <p className="text-sm font-medium truncate group-hover:text-teal dark:group-hover:text-teal transition-colors">
                     {tx.student?.fullName || "Santri"}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">
@@ -76,12 +73,11 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                   </p>
                 </div>
 
-                {/* Amount & Date */}
                 <div className="text-right flex-shrink-0">
                   <p
-                    className={`text-sm font-semibold ${
+                    className={`text-sm font-semibold tabular-nums ${
                       tx.type === "IN"
-                        ? "text-emerald-600 dark:text-emerald-400"
+                        ? "text-teal dark:text-teal"
                         : "text-red-600 dark:text-red-400"
                     }`}
                   >

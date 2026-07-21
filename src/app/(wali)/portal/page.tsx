@@ -33,19 +33,17 @@ export default function PortalSearchPage() {
   }, [debouncedSearch]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="min-h-screen bg-sand dark:bg-navy flex flex-col">
+      <header className="sticky top-0 z-50 w-full glass">
         <div className="container flex h-16 items-center justify-between px-4 max-w-3xl mx-auto">
           <div className="flex items-center gap-2">
-            <Wallet className="h-6 w-6 text-emerald-600" />
+            <Wallet className="h-6 w-6 text-teal" />
             <span className="font-bold text-lg tracking-tight">Portal Wali</span>
           </div>
           <ThemeToggle />
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 container px-4 py-8 max-w-3xl mx-auto space-y-6">
         <div className="space-y-2 text-center mb-8">
           <h1 className="text-2xl font-bold tracking-tight">Cek Saldo Santri</h1>
@@ -54,18 +52,16 @@ export default function PortalSearchPage() {
           </p>
         </div>
 
-        {/* Search Input */}
         <div className="relative max-w-xl mx-auto">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             placeholder="Cari nama anak..."
-            className="pl-12 h-14 text-lg rounded-full shadow-sm border-muted-foreground/20 focus-visible:ring-emerald-500"
+            className="pl-12 h-14 text-lg rounded-xl shadow-sm"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        {/* Results List */}
         <div className="mt-8 space-y-3">
           {loading ? (
             <div className="flex justify-center py-12 text-muted-foreground">
@@ -79,10 +75,10 @@ export default function PortalSearchPage() {
           ) : (
             data?.data.map((student) => (
               <Link key={student.id} href={`/portal/${student.id}`}>
-                <Card className="hover:border-emerald-500/50 hover:shadow-md transition-all cursor-pointer overflow-hidden group">
+                <Card className="hover:border-teal/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden group">
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-full bg-emerald-100 dark:bg-emerald-950/50 flex items-center justify-center flex-shrink-0 text-emerald-600">
+                      <div className="h-12 w-12 rounded-full bg-teal/10 dark:bg-teal/20 flex items-center justify-center flex-shrink-0 text-teal">
                         <User className="h-6 w-6" />
                       </div>
                       <div>
@@ -93,9 +89,9 @@ export default function PortalSearchPage() {
                     <div className="flex items-center gap-4 text-right">
                       <div className="hidden sm:block">
                         <p className="text-sm text-muted-foreground">Sisa Saldo</p>
-                        <p className="font-medium text-emerald-600">{formatCurrency(student.currentBalance)}</p>
+                        <p className="font-semibold text-teal dark:text-teal">{formatCurrency(student.currentBalance)}</p>
                       </div>
-                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-emerald-500 transition-colors" />
+                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-teal transition-colors" />
                     </div>
                   </CardContent>
                 </Card>

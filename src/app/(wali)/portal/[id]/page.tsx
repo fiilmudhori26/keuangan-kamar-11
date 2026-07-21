@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getPublicStudentDetails, getPublicStudentTransactions } from "@/actions/public";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowDownRight, ArrowUpRight, ChevronLeft, Loader2, Wallet, Calendar } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
@@ -46,18 +46,18 @@ export default function PortalStudentDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+      <div className="min-h-screen flex items-center justify-center bg-sand dark:bg-navy">
+        <Loader2 className="h-8 w-8 animate-spin text-teal" />
       </div>
     );
   }
 
   if (!student) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center bg-sand dark:bg-navy">
         <h2 className="text-2xl font-bold mb-2">Santri tidak ditemukan</h2>
         <p className="text-muted-foreground mb-6">Mungkin data telah dihapus atau ID salah.</p>
-        <Link href="/portal" className="text-emerald-600 font-medium hover:underline flex items-center gap-2">
+        <Link href="/portal" className="text-teal font-medium hover:underline flex items-center gap-2">
           <ChevronLeft className="h-4 w-4" /> Kembali ke Pencarian
         </Link>
       </div>
@@ -65,9 +65,8 @@ export default function PortalStudentDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pb-12">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="min-h-screen bg-sand dark:bg-navy pb-12">
+      <header className="sticky top-0 z-50 w-full glass">
         <div className="container flex h-16 items-center justify-between px-4 max-w-3xl mx-auto">
           <Link href="/portal" className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             <ChevronLeft className="h-5 w-5" />
@@ -78,8 +77,7 @@ export default function PortalStudentDetailsPage() {
       </header>
 
       <main className="container px-4 py-6 max-w-3xl mx-auto space-y-6">
-        {/* Profile Card */}
-        <Card className="border-0 shadow-md bg-gradient-to-br from-emerald-600 to-teal-700 text-primary-foreground overflow-hidden">
+        <Card className="bg-gradient-to-br from-teal to-teal/80 text-white overflow-hidden border-0">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
@@ -89,13 +87,13 @@ export default function PortalStudentDetailsPage() {
                 <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-1">
                   {student.fullName}
                 </h1>
-                <p className="text-emerald-100/80 text-sm">
+                <p className="text-white/70 text-sm">
                   Diperbarui {format(new Date(student.updatedAt), "dd MMM yyyy, HH:mm", { locale: id })}
                 </p>
               </div>
               
               <div className="bg-black/20 p-4 rounded-2xl backdrop-blur-sm min-w-[200px]">
-                <div className="flex items-center gap-2 text-emerald-100/80 mb-1">
+                <div className="flex items-center gap-2 text-white/80 mb-1">
                   <Wallet className="h-4 w-4" />
                   <span className="text-sm font-medium">Sisa Uang Saku</span>
                 </div>
@@ -107,11 +105,10 @@ export default function PortalStudentDetailsPage() {
           </CardContent>
         </Card>
 
-        {/* Transactions */}
         <div className="space-y-4">
           <h2 className="text-lg font-semibold tracking-tight px-1">Riwayat Transaksi Terakhir</h2>
           
-          <Card className="border-0 shadow-md overflow-hidden">
+          <Card className="overflow-hidden">
             <div className="divide-y divide-border/50">
               {transactions.length === 0 ? (
                 <div className="p-8 text-center text-muted-foreground">
@@ -119,11 +116,11 @@ export default function PortalStudentDetailsPage() {
                 </div>
               ) : (
                 transactions.map((tx) => (
-                  <div key={tx.id} className="p-4 flex items-center justify-between hover:bg-muted/30 transition-colors">
+                  <div key={tx.id} className="p-4 flex items-center justify-between hover:bg-teal-50/50 dark:hover:bg-teal-950/20 transition-colors">
                     <div className="flex items-start gap-3">
-                      <div className={`mt-0.5 p-2 rounded-full ${
+                      <div className={`mt-0.5 p-2 rounded-lg ${
                         tx.type === "IN" 
-                          ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50" 
+                          ? "bg-teal/10 text-teal dark:bg-teal/20" 
                           : "bg-rose-100 text-rose-600 dark:bg-rose-950/50"
                       }`}>
                         {tx.type === "IN" ? (
@@ -141,8 +138,8 @@ export default function PortalStudentDetailsPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className={`font-semibold ${
-                        tx.type === "IN" ? "text-emerald-600" : "text-rose-600"
+                      <p className={`font-semibold tabular-nums ${
+                        tx.type === "IN" ? "text-teal dark:text-teal" : "text-rose-600"
                       }`}>
                         {tx.type === "IN" ? "+" : "-"}{formatCurrency(tx.amount)}
                       </p>
