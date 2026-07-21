@@ -75,6 +75,7 @@ export default function StudentDetailPage() {
   const [txTotalPages, setTxTotalPages] = useState(0);
   const [dateFilter, setDateFilter] = useState<DateFilterType>("month");
 
+  const [refreshKey, setRefreshKey] = useState(0);
   const [showTxDialog, setShowTxDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -112,7 +113,7 @@ export default function StudentDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [studentId, txPage, dateFilter]);
+  }, [studentId, txPage, dateFilter, refreshKey]);
 
   useEffect(() => {
     fetchData();
@@ -135,13 +136,14 @@ export default function StudentDetailPage() {
       );
 
       if (result.success) {
-        toast.success("Transaksi berhasil disimpan");
         setShowTxDialog(false);
         setTxDescription("");
         setTxAmount("");
         setTxType("IN");
         setTxDate(new Date().toISOString().split("T")[0]);
-        fetchData();
+        await fetchData();
+        setRefreshKey((k) => k + 1);
+        toast.success("Transaksi berhasil disimpan");
       } else {
         toast.error(result.error || "Gagal menyimpan transaksi");
       }
@@ -162,9 +164,10 @@ export default function StudentDetailPage() {
     try {
       const result = await updateStudent(studentId, editName, editRoom);
       if (result.success) {
-        toast.success("Data santri berhasil diperbarui");
         setShowEditDialog(false);
-        fetchData();
+        await fetchData();
+        setRefreshKey((k) => k + 1);
+        toast.success("Data santri berhasil diperbarui");
       } else {
         toast.error(result.error || "Gagal mengupdate data");
       }
@@ -181,9 +184,10 @@ export default function StudentDetailPage() {
     try {
       const result = await deleteTransaction(deleteId);
       if (result.success) {
-        toast.success("Transaksi berhasil dihapus");
         setDeleteId(null);
-        fetchData();
+        await fetchData();
+        setRefreshKey((k) => k + 1);
+        toast.success("Transaksi berhasil dihapus");
       } else {
         toast.error(result.error || "Gagal menghapus transaksi");
       }
