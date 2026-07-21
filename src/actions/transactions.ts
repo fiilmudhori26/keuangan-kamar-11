@@ -1,30 +1,12 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@/lib/supabase/server";
 import { ITEMS_PER_PAGE } from "@/lib/constants";
 import { startOfToday, startOfWeek, startOfMonth } from "@/lib/utils";
 import type { ActionResponse, PaginatedResponse, TransactionData, DateFilterType } from "@/types";
 import { revalidatePath } from "next/cache";
 import type { Prisma } from "@prisma/client";
-
-async function requirePengurus(): Promise<string> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error("Unauthorized");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.role !== "pengurus") throw new Error("Forbidden");
-  return user.id;
-}
+import { requirePengurus } from "@/lib/auth";
 
 export async function createTransaction(
   studentId: string,

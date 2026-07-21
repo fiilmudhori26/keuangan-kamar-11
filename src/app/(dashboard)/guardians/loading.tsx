@@ -4,7 +4,10 @@ import { PageHeader } from "@/components/shared/page-header";
 export default function Loading() {
   return (
     <>
-      <PageHeader title="Data Santri" description="Kelola data dan keuangan santri" />
+      <PageHeader
+        title="Kelola Wali Santri"
+        description="Buat dan kelola akun wali santri"
+      />
       <TableSkeleton rows={5} />
     </>
   );

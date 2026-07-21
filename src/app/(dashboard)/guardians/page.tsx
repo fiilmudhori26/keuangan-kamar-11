@@ -102,7 +102,9 @@ export default function GuardiansPage() {
     setPage(1);
   }, [debouncedSearch]);
 
+  // Load students only when dialog opens (lazy)
   useEffect(() => {
+    if (!showAddDialog || students.length > 0) return;
     async function loadStudents() {
       try {
         const result = await getAllStudentsSimple();
@@ -112,7 +114,7 @@ export default function GuardiansPage() {
       }
     }
     loadStudents();
-  }, []);
+  }, [showAddDialog, students.length]);
 
   async function handleAddGuardian() {
     if (!formName || !formEmail || !formPassword || !formStudentId) {

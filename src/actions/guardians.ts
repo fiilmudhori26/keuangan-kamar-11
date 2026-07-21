@@ -1,28 +1,11 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { ITEMS_PER_PAGE } from "@/lib/constants";
 import type { ActionResponse, PaginatedResponse, GuardianStudentData } from "@/types";
 import { revalidatePath } from "next/cache";
-
-async function requirePengurus(): Promise<string> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) throw new Error("Unauthorized");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.role !== "pengurus") throw new Error("Forbidden");
-  return user.id;
-}
+import { requirePengurus } from "@/lib/auth";
 
 export async function getGuardians(
   page: number = 1,
