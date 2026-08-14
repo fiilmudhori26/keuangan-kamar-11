@@ -1,7 +1,4 @@
-"use client";
-
-import { useCurrentUser } from "@/hooks/use-current-user";
-import { logoutAction } from "@/actions/auth";
+import { getCurrentProfile, logoutAction } from "@/actions/auth";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { Button } from "@/components/ui/button";
@@ -13,8 +10,8 @@ const roleLabel = {
   wali: "Wali Santri",
 } as const;
 
-export function Header() {
-  const { user } = useCurrentUser();
+export async function Header() {
+  const user = await getCurrentProfile();
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 glass px-4 sm:px-6">

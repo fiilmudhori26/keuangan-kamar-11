@@ -11,17 +11,39 @@ function isPublicPath(path: string): boolean {
   return path === "/login" || path === "/" || path.startsWith("/portal");
 }
 
+// ponytail: session cookie heuristic (sb-*-auth-token) — no network round-trip.
+// Expired cookie still caught by getUser below; false-negative = 1 extra getUser, never an auth bypass.
+function hasSessionCookie(request: NextRequest): boolean {
+  return request.cookies
+    .getAll()
+    .some((c) => c.name.includes("auth-token"));
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
+
+  const path = request.nextUrl.pathname;
+
+  // Fast path: no session cookie → skip getUser() entirely (saves 1-2 RTT per anon visit)
+  if (!hasSessionCookie(request)) {
+    if (isPublicPath(path)) return supabaseResponse; // anonim di public: serve langsung
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url); // anonim di protected: redirect tanpa getUser
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() { return request.cookies.getAll(); },
+        getAll() {
+          return request.cookies.getAll();
+        },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
           supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
@@ -31,10 +53,11 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
-  const path = request.nextUrl.pathname;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // Unauthenticated → allow only public paths
+  // Unauthenticated (expired/invalid cookie) → allow only public paths
   if (!user) {
     if (!isPublicPath(path)) {
       const url = request.nextUrl.clone();
@@ -54,10 +77,10 @@ export async function updateSession(request: NextRequest) {
       .eq("id", user.id)
       .single();
 
-    // On public/login path → redirect to dashboard
+    // On public/login path → redirect to dashboard (or portal if wali)
     if (isPublicPath(path)) {
       const url = request.nextUrl.clone();
-      url.pathname = "/dashboard";
+      url.pathname = profile?.role === "wali" ? "/portal" : "/dashboard";
       return NextResponse.redirect(url);
     }
 
