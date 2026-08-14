@@ -2,9 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { loginFormSchema, type LoginFormValues } from "@/validators/auth";
 import { loginAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,19 +15,23 @@ export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginFormSchema),
-  });
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const email = String(form.get("email") || "");
+    const password = String(form.get("password") || "");
 
-  async function onSubmit(data: LoginFormValues) {
+    const next: typeof errors = {};
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) next.email = "Format email tidak valid";
+    if (password.length < 6) next.password = "Password minimal 6 karakter";
+    setErrors(next);
+    if (Object.keys(next).length) return;
+
     setLoading(true);
     try {
-      const result = await loginAction(data.email, data.password);
+      const result = await loginAction(email, password);
 
       if (result.success) {
         toast.success("Login berhasil!", {
@@ -75,22 +76,22 @@ export default function LoginPage() {
         </CardHeader>
 
         <CardContent className="pt-4">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="masukkan@email.com"
-                  className="pl-10"
-                  disabled={loading}
-                  {...register("email")}
-                />
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="masukkan@email.com"
+                    className="pl-10"
+                    disabled={loading}
+                  />
               </div>
               {errors.email && (
-                <p className="text-xs text-destructive">{errors.email.message}</p>
+                <p className="text-xs text-destructive">{errors.email}</p>
               )}
             </div>
 
@@ -100,11 +101,11 @@ export default function LoginPage() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••"
                   className="pl-10 pr-10"
                   disabled={loading}
-                  {...register("password")}
                 />
                 <button
                   type="button"
@@ -121,7 +122,7 @@ export default function LoginPage() {
               </div>
               {errors.password && (
                 <p className="text-xs text-destructive">
-                  {errors.password.message}
+                  {errors.password}
                 </p>
               )}
             </div>
