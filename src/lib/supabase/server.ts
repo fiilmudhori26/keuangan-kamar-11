@@ -1,10 +1,16 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+// ponytail: per-request singleton. @supabase/ssr server client init is costly
+// (cookie parse + key setup). One per request, not one per call. Reset on cold start only.
+const g = globalThis as unknown as { __sbClient?: ReturnType<typeof createServerClient> };
+
 export async function createClient() {
+  if (g.__sbClient) return g.__sbClient;
+
   const cookieStore = await cookies();
 
-  return createServerClient(
+  g.__sbClient = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -25,6 +31,8 @@ export async function createClient() {
       },
     }
   );
+
+  return g.__sbClient;
 }
 
 /**
