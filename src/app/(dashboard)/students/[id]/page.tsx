@@ -297,7 +297,7 @@ export default function StudentDetailPage() {
           <CardTitle className="text-lg">Riwayat Transaksi</CardTitle>
           <div className="flex items-center gap-2">
             <div className="flex gap-1 overflow-x-auto pb-0.5 scrollbar-none">
-              {(["today", "week", "month"] as DateFilterType[]).map((f) => (
+              {(["today", "week", "month", "all"] as DateFilterType[]).map((f) => (
                 <Button
                   key={f}
                   variant={dateFilter === f ? "default" : "outline"}
@@ -312,7 +312,9 @@ export default function StudentDetailPage() {
                     ? "Hari Ini"
                     : f === "week"
                     ? "Minggu Ini"
-                    : "Bulan Ini"}
+                    : f === "month"
+                    ? "Bulan Ini"
+                    : "Semua"}
                 </Button>
               ))}
             </div>

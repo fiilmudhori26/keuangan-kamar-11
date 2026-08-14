@@ -58,4 +58,4 @@ export interface ActionResponse<T = unknown> {
   error?: string;
 }
 
-export type DateFilterType = "today" | "week" | "month" | "custom";
+export type DateFilterType = "today" | "week" | "month" | "custom" | "all";

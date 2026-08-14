@@ -146,6 +146,8 @@ export async function getTransactions(
     case "month":
       dateFrom = startOfMonth();
       break;
+    case "all":
+      break;
     case "custom":
       dateFrom = customFrom ? new Date(customFrom) : undefined;
       if (customTo) {

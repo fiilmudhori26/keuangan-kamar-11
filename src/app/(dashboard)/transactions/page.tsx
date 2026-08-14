@@ -101,6 +101,7 @@ export default function TransactionsPage() {
     { key: "today", label: "Hari Ini" },
     { key: "week", label: "Minggu Ini" },
     { key: "month", label: "Bulan Ini" },
+    { key: "all", label: "Semua" },
   ];
 
   return (
