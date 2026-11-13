@@ -1,5 +1,6 @@
 # 🕌 Keuangan Santri (Pesantren Finance Management)
 
+![Keuangan Santri Dashboard](./screenshots/dashboard.png)
 
 **Keuangan Santri** adalah sebuah aplikasi web modern yang dirancang khusus untuk mengelola sisa uang saku dan riwayat transaksi (pemasukan & pengeluaran) para santri di kamar pesantren secara transparan, akurat, dan mudah diakses.
 
