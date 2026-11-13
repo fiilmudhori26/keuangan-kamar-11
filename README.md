@@ -1,6 +1,5 @@
 # 🕌 Keuangan Santri (Pesantren Finance Management)
 
-![Keuangan Santri Banner](https://via.placeholder.com/1200x600/0f172a/10b981?text=Keuangan+Santri+-+Dashboard)
 
 **Keuangan Santri** adalah sebuah aplikasi web modern yang dirancang khusus untuk mengelola sisa uang saku dan riwayat transaksi (pemasukan & pengeluaran) para santri di kamar pesantren secara transparan, akurat, dan mudah diakses.
 
@@ -34,15 +33,6 @@ Aplikasi ini dibangun menggunakan teknologi *Full-Stack* terbaru dan terbaik di 
 
 ---
 
-## 📸 Panduan Menambahkan Screenshot (Untuk Portofolio)
-
-> **Catatan untuk Pemilik Repo:** Hapus blok ini dan ganti dengan *screenshot* asli dari aplikasi Anda agar portofolionya terlihat profesional!
-
-1. Masukkan foto halaman **Dashboard** di sini.
-2. Masukkan foto halaman **Portal Wali (Pencarian)** di sini.
-3. Masukkan foto halaman **Detail Transaksi Santri** di sini.
-
----
 
 ## 🚀 Instalasi & Menjalankan di Komputer Lokal
 
